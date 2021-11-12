@@ -4,8 +4,6 @@ const USDT = artifacts.require("USDT");
 
 
 module.exports = async function (deployer, network, accounts) {
-
-
   await deployer.deploy(UCP, 10 * 10 ** 8) ;
   const ucp = await UCP.deployed();
   console.log("El address de UCP es: " + ucp.address)

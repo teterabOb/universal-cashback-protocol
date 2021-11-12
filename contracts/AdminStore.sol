@@ -3,13 +3,11 @@ pragma solidity 0.8.0;
 import './Store.sol';
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract FabricStore{
+contract AdminStore{
     uint private qtyStores;
     address private UCP;
     IERC20 private USDT;
-    
-
-    
+        
     struct LocalStore{
         uint id;
         address owner;
@@ -31,7 +29,7 @@ contract FabricStore{
         qtyStores = 1;
         USDT = IERC20(_USDT);
     }
-    
+
     function CreateStore(string memory _name) public {
         Store cStore = new Store(msg.sender, qtyStores, _name, address(USDT));
         require(address(cStore) != address(0), "Contract must be deployed");
