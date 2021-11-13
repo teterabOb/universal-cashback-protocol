@@ -8,6 +8,7 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 contract UCPToken is ERC20 {
 
     ERC20 private USDT;
+    address private CONTRACT_PROTOCOL;
 
     mapping(address => bool) contractAllowedToMint;
     mapping(address => uint) amountAllowedToMint;
@@ -26,17 +27,18 @@ contract UCPToken is ERC20 {
 
     function mintToken(uint256 _amount) external virtual {
         require(contractAllowedToMint[msg.sender] == true, "Must be allowed to mint");
+        require(amountAllowedToMint[msg.sender] == _amount, "Can't exceed amount allowed to mint");
+        setAmountAllowedToMint(0);        
         _mint(msg.sender, _amount);
     } 
 
-    function addAddressAllowToMint(address _contractAddress) public returns(bool){
-        //require(contractAllowsToMint[msg.sender] == false, "it exists");
-        contractAllowedToMint[_contractAddress] = true;
-        return true;
+    function addAddressAllowToMint(address _contractAddress) public{
+        require(CONTRACT_PROTOCOL == msg.sender, "Only de Contract Protocol can add Address");
+        contractAllowedToMint[_contractAddress] = true;        
     }
 
-    function setAmountAllowedToMint() public {
-
+    function setAmountAllowedToMint(uint _amount) internal {
+        amountAllowedToMint[msg.sender] = _amount;
     }
 
     function getAmountAllowedToMintByAddress(address _account) public view returns(uint){

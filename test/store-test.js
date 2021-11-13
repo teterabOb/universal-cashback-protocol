@@ -11,8 +11,6 @@ describe("Store Contract", function () {
     const Store = await hre.ethers.getContractFactory("Store");
     const AdminProtocol = await hre.ethers.getContractFactory("AdminProtocol");
     
-    
-
     const usdt = await USD.deploy(10000);
     await usdt.deployed();
     
@@ -30,10 +28,10 @@ describe("Store Contract", function () {
     console.log("El amount previo del contrato es: " + contractAmountPrev);
     console.log("El amount previo del deployer es: " + deployerAmountPrev);
 
-    const allowToMint = await ucp.addAddressAllowToMint(store.address);
-    console.log("El contrato está habilitado para mintear: " + allowToMint);
+    //const allowToMint = await ucp.addAddressAllowToMint(store.address);
+    //console.log("El contrato está habilitado para mintear: " + allowToMint);
 
-    const resApprove = await usdt.approve(store.address, 1000000000000)
+    const resApprove = await usdt.approve(store.address, ethers.utils.parseEther('1000000'))
     const allowance = await usdt.allowance(deployer.address, store.address)    
     console.log("El allowance del contrato es: " + allowance);
     console.log("El contrato store en un inicio tiene UCP: " + await ucp.balanceOf(store.address));
@@ -45,9 +43,12 @@ describe("Store Contract", function () {
 
     await store.addTokenToPriceFeed(USDTContract, chainlinkUSDTContract);
 
-    const buy = await store.buyToken(20, USDTContract);
+    const buy = await store.buyToken(ethers.utils.parseEther('100'), USDTContract);
     console.log("El monto en USDT a pagar es: " + buy);
 
+    const priceUSDT = await store.getTokenPriceByChainlink(USDTContract);
+    console.log("El precio de USDT es: " + priceUSDT);
+    
     const contractAmount = await usdt.balanceOf(store.address)
     const deployerAmount = await usdt.balanceOf(deployer.address)
     const finalAllowance = await usdt.allowance(deployer.address, store.address)
@@ -65,7 +66,7 @@ describe("Store Contract", function () {
     const USD = await hre.ethers.getContractFactory("USDT");
     const Store = await hre.ethers.getContractFactory("Store");
     
-    const usdt = await USD.deploy(10000);
+    const usdt = await USD.deploy(ethers.utils.parseEther('100000000'));
     await usdt.deployed();
   
     const ucp = await UCPToken.deploy(usdt.address);

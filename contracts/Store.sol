@@ -2,6 +2,7 @@
 pragma solidity 0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
 import "./UCPToken.sol";
 
 contract Store{
@@ -9,6 +10,7 @@ contract Store{
     uint256 private qtyPromotions;
     uint256 private qtyProducts;
     uint256 private counterProductsAsigned;
+    uint256 immutable private MINIMUN_TOKEN = 1 * 10 ** 18;
     string private nameStore;
     address private contractOwner;
     address private CONTRACT_PROTOCOL;
@@ -58,17 +60,23 @@ contract Store{
     }
 
     function buyToken(uint256 _amount, address _token) public view returns (uint256){  
-        require(_amount >= 1, "Amount must be greather tan 1");
+        //require(_amount >= MINIMUN_TOKEN, "Amount must be greather tan 1");
         //Calcula el monto a pagar por la cantidad de UCP requeridos
-        //uint256 totalToPay =  (_amount / (10 * 10 * 8)) * getTokenPriceByChainlink(_token);
-        uint256 totalToPay =  (10 * 10 ** 6);
+        //uint256 totalToPay =  (_amount / (10 * 10 ** 18)) * getTokenPriceByChainlink(_token);   
+        //uint256 totalToPay =  (_amount / (10 * 10 ** 18)) / 10 ** (18 - 6);   
+        uint256 totalToPay =  ((_amount / 10) / (10 ** (18 - 6))) * (getTokenPriceByChainlink(_token) / (10 ** 2));   
+
+        //Este valor esta OK, es el price Feed pero con 6 decimales al igual que USDT
+        //uint256 totalToPay =  getTokenPriceByChainlink(_token) / (10 ** 2);        
+
+        //uint totalToPay = _amount;
         //Solicita el pago en USDT - El <address _token> permite que sea dinamico
         //USDT.transferFrom(msg.sender, address(this), totalToPay);         
         //Mintea la cantidad de Tokens  
         //UCT.mintToken(10000); 
         //Transfiere los USDT al Contrato que Administra el Protocolo
         //USDT.transfer(CONTRACT_PROTOCOL, 1);   
-        return totalToPay;    
+        return totalToPay / (10 ** 6);    
     }
 
     function CreatePromotion(uint256 _startDate, uint256 _endDate) isOwner public{

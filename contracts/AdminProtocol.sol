@@ -27,13 +27,14 @@ contract AdminProtocol{
     
     mapping(uint => LocalStore) stores;
     mapping(address => mapping(uint => LocalStore)) storesByOwner;
+    mapping(address => uint) amountAllowedToMint;
 
     constructor(address _USDT){
         qtyStores = 1;
         USDT = IERC20(_USDT);
     }
 
-    function CreateStore(string memory _name) public {
+    function createStore(string memory _name) public {
         Store cStore = new Store(msg.sender, qtyStores, _name, address(USDT), token, address(this));
         require(address(cStore) != address(0), "Contract must be deployed");
         LocalStore memory localStore = LocalStore(qtyStores, msg.sender, _name, 0, address(cStore));
@@ -42,12 +43,23 @@ contract AdminProtocol{
         qtyStores++;
     }
 
-    function GetInfoStore(uint _id) public view returns(LocalStore memory store){
+    function getInfoStore(uint _id) public view returns(LocalStore memory store){
         return stores[_id];
     }
     
-    function GetStoreByOwner(address _owner, uint256 _idStore) internal view returns(LocalStore memory store){
+    function getStoreByOwner(address _owner, uint256 _idStore) internal view returns(LocalStore memory store){
         return storesByOwner[_owner][_idStore];
-    }      
+    }
+
+    function getAmountAllowedToMint(address _contract) public view returns(uint){
+        return amountAllowedToMint[_contract];
+    }
+
+    function updateAmountAllowedToMint(address _contract, uint256 _amount) external{
+        amountAllowedToMint[_contract] = _amount;
+    }
+
+
+
     
 }
